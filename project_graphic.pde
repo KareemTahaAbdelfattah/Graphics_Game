@@ -6,22 +6,33 @@ AudioPlayer music;
 
 PImage backgroundImage1;
 PImage backgroundImage2;
+
+PImage fire;
+PImage water;
+
 int currentPage = 0;
 boolean tr= true ;
 Raindrop[] raindrops; // Array to store raindrop objects
 
+float fireY, waterY;
+float motionSpeed = 0.02;
 
 
 
 void setup() {
   size(1200, 900);
-  
+  fireY = height/2 + 10;
+  waterY = height/2 + 10;
   minim = new Minim(this);
   music = minim.loadFile("theme_song.mp3");
   music.loop();
   
-  
-  
+  //load fire image
+  fire= loadImage("fire.png");
+
+  //load water image
+  water= loadImage("water.png");
+
   // Load the image
   backgroundImage1 = loadImage("background_menu.jpeg");  // Replace "your_image_file.jpg" with the actual file path or URL of your image
   backgroundImage1.resize(1200, 900);  // Resize the image to match the canvas size
@@ -64,8 +75,19 @@ void draw() {
     drawButton("Instructions", 3.25*width/4, 3.55*height/4, 200, 50,3);
     
   } else if (currentPage == 1) {
-    background(255, 178, 102); // Page 1 background
-    drawButton("Back", 3*width/4, 2.5*height/4, 100, 40, 0);
+    background(backgroundImage2); // Page 3 background
+    drawButton("Play with Fire", width/2 - 300, height/2 - 100, 200, 50, 1);
+    drawButton("Play with Snow", width/2+300, height/2 - 100, 200, 50, 2);
+    
+    image(fire, width/2 - 370, fireY, 200, 100);
+    fireY += sin(frameCount * motionSpeed) * 2; // Adjust the '2' for the amplitude of the motion
+
+    // Draw the water image with continuous motion
+    image(water, width/2 + 250, waterY, 200, 100);
+    waterY += sin(frameCount * motionSpeed) * 2;
+    
+    drawButton("Back", width - 100, height - 100, 100, 40, 0);
+
   } else if (currentPage == 2) {
     background(200, 255, 200); // Page 2 background
     drawButton("Back", 3*width/4, 2.75*height/4, 100, 40,0);
