@@ -16,7 +16,7 @@ class bar {
 
 }
 
-PImage wood;
+PImage wood,ice,bar_choice;
 Queue<bar> myQueue = new LinkedList<>();
 
 void setup() {
@@ -42,22 +42,24 @@ myQueue.add(bar_7);
 myQueue.add(bar_8);
 myQueue.add(bar_9);
  smooth();
-
+ ice=loadImage("first_block.png");
  wood = loadImage("woodBar.png");
 }
-void display()
+void display(int mode)
 {
+  if(mode==1) bar_choice=wood;
+  else bar_choice=ice;
   LinkedList<bar> myList = new LinkedList<>(myQueue);
   int i=0;
   for(i=0;i<myQueue.size();i++)
   {
-    image(wood, myList.get(i).x, myList.get(i).y,myList.get(i).width,40);
+    image(bar_choice, myList.get(i).x, myList.get(i).y,myList.get(i).width,40);
   }
 }
 void draw() {
  background(255);
  
- display();
+ display(2);
  //shape(network, 180, 10, 280, 280);
 }
 
