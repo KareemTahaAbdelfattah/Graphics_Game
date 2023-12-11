@@ -50,18 +50,6 @@ void setup() {
 
 void draw() {
   // Set the background to the loaded image
-  background(backgroundImage1);
-  
-  
-  
-  
-  
-  
-  // Simulate rain animation
-  for (Raindrop raindrop : raindrops) {
-    raindrop.fall();
-    raindrop.display();
-  }
   
   // Your drawing code goes here
   fill(255, 178, 102);
@@ -70,27 +58,38 @@ void draw() {
   
   // Display buttons based on the current page
   if (currentPage == 0) {
+    background(backgroundImage1);
     drawButton("Play Game", 3.25*width/4, 2.75*height/4,200, 50, 1);
     drawButton("Options", 3.25*width/4, 3.15*height/4, 200, 50,2);
     drawButton("Instructions", 3.25*width/4, 3.55*height/4, 200, 50,3);
+    
+    // Simulate rain animation
+    for (Raindrop raindrop : raindrops) {
+      raindrop.fall();
+      raindrop.display();
+    }
     
   } else if (currentPage == 1) {
     background(backgroundImage2); // Page 3 background
     drawButton("Play with Fire", width/2 - 300, height/2 - 100, 200, 50, 1);
     drawButton("Play with Snow", width/2+300, height/2 - 100, 200, 50, 2);
     
-    image(fire, width/2 - 370, fireY, 200, 100);
+    image(fire, width/2 - 370, fireY, 150, 100);
     fireY += sin(frameCount * motionSpeed) * 2; // Adjust the '2' for the amplitude of the motion
 
     // Draw the water image with continuous motion
-    image(water, width/2 + 250, waterY, 200, 100);
+    image(water, width/2 + 230, waterY, 150, 100);
     waterY += sin(frameCount * motionSpeed) * 2;
     
+    for (Raindrop raindrop : raindrops) {
+      raindrop.fall();
+      raindrop.display();
+    }
     drawButton("Back", width - 100, height - 100, 100, 40, 0);
 
   } else if (currentPage == 2) {
     background(200, 255, 200); // Page 2 background
-    drawButton("Back", 3*width/4, 2.75*height/4, 100, 40,0);
+    drawButton("Back", width/2, 3.5*height/4, 200, 60, 0);
   } else if (currentPage == 3) {
     background(backgroundImage2); // Page 3 background
     displayPage3Title();
@@ -99,7 +98,7 @@ void draw() {
       raindrop.fall();
       raindrop.display();
     }
-    drawButton("Back", width/2, 3.5*height/4, 200, 60,0);
+    drawButton("Back", width/2, 3.5*height/4, 200, 60, 0);
     
   }
   
@@ -130,8 +129,6 @@ void drawButton(String label, float x, float y, float w, float h, int targetPage
       currentPage = targetPage;
      
       music.loop();
-   
-    
     
   }
 
@@ -177,7 +174,7 @@ void displayPage3Text() {
   // Display other instructions without rectangles
   
   for (int i = 0; i < instructions.length; i++) {
-    text(instructions[i], textX + 280, textY);
+    text(instructions[i], textX + 285, textY + 10);
     textY += 100;
   }
    
