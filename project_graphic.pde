@@ -368,6 +368,7 @@ void draw() {
            display(1);
            vertical_bar_speed = level*2;
            horizontal_bar_speed = level;
+           par = (level - 1) * 5;
            movment(1);
            intersection(X,Y,myList);
            coins_handle();
