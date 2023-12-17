@@ -3,7 +3,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 Minim minim;
 AudioPlayer music;
-
 /*----------------------------------------------------------------Classes Construction-----------------------------------------------------------------*/
 class Raindrop {
   float x, y; // Position of the raindrop
@@ -53,6 +52,7 @@ class bar {
 PFont score_font;
 PImage backgroundImage1;
 PImage backgroundImage2;
+PImage backgroundImage3;
 PImage Fireboy;
 PImage Watergirl,player_choice;
 PImage wood,ice,bar_choice, fire_background, water_background, ice_wall1, ice_wall2, wood_wall1, wood_wall2, stone_wall;
@@ -74,6 +74,11 @@ int par = 0;
 int level;
 float fireY, waterY;
 float motionSpeed = 0.02;
+int gameOverOpacity = 0;
+float angle = 0.0;
+boolean rotateGameover1 = true;
+int startTime;
+
 Raindrop[] raindrops; // Array to store raindrop objects
 LinkedList<bar> myList = new LinkedList<bar>();
 
@@ -86,12 +91,15 @@ void setup() {
     minim = new Minim(this);
     music = minim.loadFile("theme_song.mp3");
     music.loop();
+    startTime = millis(); // Record the start time
     
     // Load the image
     backgroundImage1 = loadImage("background_menu.jpeg");  // Replace "your_image_file.jpg" with the actual file path or URL of your image
     backgroundImage1.resize(1200, 900);  // Resize the image to match the canvas size
     backgroundImage2 = loadImage("background2.jpeg");  // Replace "your_image_file.jpg" with the actual file path or URL of your image
     backgroundImage2.resize(1200, 900);  // Resize the image to match the canvas size
+    backgroundImage3 = loadImage("over.jpeg"); 
+    backgroundImage3.resize(1200, 900);
     raindrops = new Raindrop[100]; // Adjust the number of raindrops as needed
     // Initialize raindrop objects
     for (int i = 0; i < raindrops.length; i++) {
@@ -129,6 +137,7 @@ void game_init()
     score = 0;
     level = 1;
     myList.clear();
+     
     bar bar_1=new bar(random(250,650),0,random(150,300));
     bar_1.coin_x = random( bar_1.x , bar_1.x + bar_1.width -coinSize);
     bar bar_2=new bar(random(250,650),100,random(150,300));
@@ -198,7 +207,8 @@ void movment(int mode1)
    ySpeed += gravity;
    X += xSpeed;
     
-   image(player_choice, X, Y-40, Size, Size);
+   if(player_choice == Fireboy) image(player_choice, X, Y-50, Size, Size);
+   else image(player_choice, X, Y-45, Size, Size);
    
    // Keep the player within the window bounds
    X = constrain(X, 250, width - Size - 250);
@@ -227,7 +237,7 @@ void intersection(float player_x, float player_y, LinkedList<bar> myList) {
 void bar_vertical_movement(LinkedList<bar> myList) {
   if(gameStarted)
   {
-      if(Y <900)
+      if(Y < 900)
       {
           for (int i = 0; i < myList.size(); i++)
           { 
@@ -252,8 +262,8 @@ void bar_vertical_movement(LinkedList<bar> myList) {
           
           if(myList.get(myList.size()-1).y <=0)
           {
-              game_init();
-              currentPage = 0;
+              currentPage=6;
+              
           }
       }
   }
@@ -319,16 +329,19 @@ void draw() {
       {
           background(backgroundImage1);
           drawButton("Play Game", 3.25*width/4, 2.75*height/4,200, 50, 1);
-          drawButton("Options", 3.25*width/4, 3.15*height/4, 200, 50,2);
-          drawButton("Instructions", 3.25*width/4, 3.55*height/4, 200, 50,3);
+          drawButton("Instructions",3.25*width/4, 3.15*height/4, 200, 50, 2);
           // Simulate rain animation
           for (Raindrop raindrop : raindrops) {
             raindrop.fall();
             raindrop.display();
           }
+          drawButton("Exit",3.25*width/4, 3.55*height/4, 200, 50,3);
+          
+          
       } 
       else if (currentPage == 1) {
-          background(backgroundImage2); // Page 3 background
+          game_init();
+          background(backgroundImage2); // Page 1 background
           drawButton("Play with Fire", width/2 - 300, height/2 - 100, 200, 50, 4);
           drawButton("Play with Snow", width/2+300, height/2 - 100, 200, 50, 5);
           
@@ -345,14 +358,13 @@ void draw() {
           }
           drawButton("Back", width - 100, height - 100, 100, 40, 0);
       } 
-      else if (currentPage == 2) 
-      {
-          background(200, 255, 200); // Page 2 background
-          drawButton("Back", width/2, 3.5*height/4, 200, 60, 0);
-      } 
       else if (currentPage == 3) 
       {
-          background(backgroundImage2); // Page 3 background
+          exit();
+      } 
+      else if (currentPage == 2) 
+      {
+          background(backgroundImage2); // Page 2 background
           displayPage3Title();
           displayPage3Text();
           for (Raindrop raindrop : raindrops) {
@@ -368,7 +380,7 @@ void draw() {
            display(1);
            vertical_bar_speed = level*2;
            horizontal_bar_speed = level;
-           par = (level - 1) * 5;
+           par = (level - 1) * 4;
            movment(1);
            intersection(X,Y,myList);
            coins_handle();
@@ -379,6 +391,11 @@ void draw() {
              bar_horizontal_movement();
            }
            score_print();
+           for (Raindrop raindrop : raindrops) {
+            raindrop.fall();
+            raindrop.display();
+          }
+           
       } 
       else if(currentPage == 5)
       {
@@ -387,7 +404,7 @@ void draw() {
            display(2);
            vertical_bar_speed = level*2;
            horizontal_bar_speed = level;
-           par = (level - 1) * 5;
+           par = (level - 1) * 4;
            movment(2);
            intersection(X,Y,myList); 
            coins_handle();
@@ -398,6 +415,22 @@ void draw() {
              bar_horizontal_movement();
            }
            score_print();
+           for (Raindrop raindrop : raindrops) {
+            raindrop.fall();
+            raindrop.display();
+          } 
+      }
+      else if (currentPage == 6){
+        
+           background(backgroundImage3);
+           drawButton("Try Again", width/4, 3.55*height/4,200, 50, 1); 
+           drawButton("Exit",3.25*width/4, 3.55*height/4, 200, 50,3);
+           for (Raindrop raindrop : raindrops) {
+            raindrop.fall();
+            raindrop.display();
+          }
+           trans();
+           score_print();
       }
 }
 
@@ -406,7 +439,7 @@ void  keyPressed()
 {
       if ((keyCode == ' ' || keyCode == UP)&& !isJumping) {
         // Jump when spacebar is pressed and not currently jumping
-        ySpeed = -random(20, 30 + par);
+        ySpeed = -random(15, 30 + par);
         isJumping = true;  // Set the jumping flag to true
         gameStarted = true;
       } 
@@ -428,6 +461,28 @@ void keyReleased()
     }
 }
 
+
+/*----------------------------------------------------------------gameover-----------------------------------------------------------------*/
+
+void trans(){
+ 
+         if(rotateGameover1){
+           
+            translate(250, 200);
+            rotate(angle);
+            score_print();
+            angle += 0.01;
+            if (millis() - startTime >= 16000) {
+                 rotateGameover1 = false; // Stop rotating after 5 seconds
+               }
+            
+         }
+}
+           
+
+
+
+
 /*----------------------------------------------------------------Main pages Displaying Functions-----------------------------------------------------------------*/
 void drawButton(String label, float x, float y, float w, float h, int targetPage) 
 {
@@ -448,7 +503,7 @@ void drawButton(String label, float x, float y, float w, float h, int targetPage
     if (mousePressed && isMouseOver) 
     {
         currentPage = targetPage;
-        music.loop();
+        //music.loop();
     }
 }
 
@@ -481,7 +536,8 @@ void displayPage3Text() {
       "1- The player starts the game on the tower's ground floor.",
       "2- To climb the tower, the player must jump from floor to floor \n    (default control: spacebar).",
       "3- The goal is to reach the highest possible floor and\n     accumulate the greatest number of points.",
-      "4- When the character falls from the floors, he loses."
+      "4- When the character falls from the floors, he loses.",
+      "Own to Kareem, Aya, Reem, Ahmed, Mariam"
     };
     
     // Display other instructions without rectangles
