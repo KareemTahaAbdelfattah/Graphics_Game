@@ -30,6 +30,32 @@ class Raindrop {
   }
 }
 
+
+class Flames {
+  float x, y; // Position of the raindrop
+  float speed; // Falling speed
+  float diameter; // Diameter of the raindrop
+  
+  Flames() {
+    x = random(width); // Random horizontal position
+    y = random(-height, 0); // Random vertical position above the canvas
+    speed = random(2, 5); // Random falling speed
+    diameter = random(5, 15); // Random diameter
+  }
+  
+  void Flames_fall() {
+    y += speed; // Update the vertical position
+    if (y > height) {
+      y = random(-height, 0); // Reset the raindrop position if it goes below the canvas
+    }
+  }
+  
+  void Flames_display() {
+    noStroke(); // No outline for the raindrop
+    image(flames_fire, x, y, diameter, diameter);
+  }
+}
+
 class bar {
   float x;
   int y;
@@ -55,7 +81,7 @@ PImage backgroundImage2;
 PImage backgroundImage3;
 PImage Fireboy;
 PImage Watergirl,player_choice;
-PImage wood,ice,bar_choice, fire_background, water_background, ice_wall1, ice_wall2, wood_wall1, wood_wall2, stone_wall;
+PImage wood,ice,bar_choice, fire_background, water_background, ice_wall1, ice_wall2, wood_wall1, wood_wall2, stone_wall, flames_fire;
 PImage coin;
 float X, Y;
 float Size = 50;
@@ -71,15 +97,16 @@ boolean gameStarted = false;
 boolean isJumping = false; // Flag to track if the ball can jump
 int score;
 int par = 0;
+int starttime = 0;
 int level;
 float fireY, waterY;
 float motionSpeed = 0.02;
 int gameOverOpacity = 0;
 float angle = 0.0;
 boolean rotateGameover1 = true;
-int startTime;
 
 Raindrop[] raindrops; // Array to store raindrop objects
+Flames[] flames; // Array to store flames objects
 LinkedList<bar> myList = new LinkedList<bar>();
 
 
@@ -91,7 +118,6 @@ void setup() {
     minim = new Minim(this);
     music = minim.loadFile("theme_song.mp3");
     music.loop();
-    startTime = millis(); // Record the start time
     
     // Load the image
     backgroundImage1 = loadImage("background_menu.jpeg");  // Replace "your_image_file.jpg" with the actual file path or URL of your image
@@ -105,8 +131,15 @@ void setup() {
     for (int i = 0; i < raindrops.length; i++) {
       raindrops[i] = new Raindrop();
     }
+    
+    flames = new Flames[100]; // Adjust the number of flames as needed
+    // Initialize flames objects
+    for (int i = 0; i < flames.length; i++) {
+      flames[i] = new Flames();
+    }
     /*----------------------------------------------------------------Loading game's items images -----------------------------------------------------------------*/
     Fireboy = loadImage("fire.png");
+    flames_fire = loadImage("flames.png");
     Watergirl = loadImage("girll.png");
     coin=loadImage("coin.png");
     ice=loadImage("first_block-removebg-preview.png");
@@ -341,6 +374,9 @@ void draw() {
       } 
       else if (currentPage == 1) {
           game_init();
+          starttime = 0;
+          rotateGameover1 = true;
+          angle = 0.0;
           background(backgroundImage2); // Page 1 background
           drawButton("Play with Fire", width/2 - 300, height/2 - 100, 200, 50, 4);
           drawButton("Play with Snow", width/2+300, height/2 - 100, 200, 50, 5);
@@ -391,9 +427,9 @@ void draw() {
              bar_horizontal_movement();
            }
            score_print();
-           for (Raindrop raindrop : raindrops) {
-            raindrop.fall();
-            raindrop.display();
+           for (Flames flame : flames) {
+            flame.Flames_fall();
+            flame.Flames_display();
           }
            
       } 
@@ -422,6 +458,7 @@ void draw() {
       }
       else if (currentPage == 6){
         
+           starttime++;
            background(backgroundImage3);
            drawButton("Try Again", width/4, 3.55*height/4,200, 50, 1); 
            drawButton("Exit",3.25*width/4, 3.55*height/4, 200, 50,3);
@@ -465,14 +502,12 @@ void keyReleased()
 /*----------------------------------------------------------------gameover-----------------------------------------------------------------*/
 
 void trans(){
- 
          if(rotateGameover1){
-           
             translate(250, 200);
             rotate(angle);
             score_print();
             angle += 0.01;
-            if (millis() - startTime >= 16000) {
+            if (starttime >= 620) {
                  rotateGameover1 = false; // Stop rotating after 5 seconds
                }
             
